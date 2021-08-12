@@ -1,0 +1,16 @@
+service: my-serverless-app
+
+provider:
+ name: aws
+ runtime: nodejs14.x
+ memorySize: 128
+ timeout: 10
+ stage: production
+ region: ap-southeast-1
+
+functions:
+ api:
+   handler: app.universal
+   events:
+     - http: ANY {proxy+}
+     - http: ANY /
