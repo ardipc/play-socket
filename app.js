@@ -5,12 +5,13 @@ const app = express();
 
 app.use(cors());
 
-const http = require('http').Server(app);
-const io = require('socket.io')(http, {cors: {origin: "*"}});
-
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
+
+const awsServerlessExpress = require('aws-serverless-express');
+const server = awsServerlessExpress.createServer(app)
+const io = require('socket.io')(server, {cors: {origin: "*"}});
 
 io.on('connection', (socket) => {
   socket.on('request', (msg) => {
@@ -18,6 +19,8 @@ io.on('connection', (socket) => {
   });
 });
 
-http.listen(3300, () => {
+server.listen(3300, () => {
   console.log('listening on *:3300');
 });
+
+module.exports.universal = (event, context) => awsServerlessExpress.proxy(server, event, context);
